@@ -85,7 +85,7 @@ void setup(void) {
   uint8_t e;
 
   Serial.begin(921600);
-  SerialIn.begin(9600, SERIAL_8N1, UART_RX_PIN);
+  // SerialIn.begin(9600, SERIAL_8N1, UART_RX_PIN); // disabled
   randomSeed(analogRead(A3)); // Seed random() from floating analog input
 
   // Both displays share a common reset line; 0 is passed to display
@@ -108,8 +108,8 @@ void setup(void) {
   // eyelid handling in the drawEye() function -- no need for distinct
   // L-to-R or R-to-L inner loops.  Just the X coordinate of the iris is
   // then reversed when drawing this eye, so they move the same.  Magic!
-  eye[0].display.writeCommand(SSD1351_CMD_SETREMAP);
-  eye[0].display.writeData(0x76);
+  // eye[0].display.writeCommand(SSD1351_CMD_SETREMAP);
+  // eye[0].display.write16(0x76);
 }
 
 
@@ -233,7 +233,8 @@ void frame( // Process motion for a single frame of left or right eye
   // yyy: y position in zero-extended decimal 000-255
   // _: space character
 
-  while (SerialIn.available()) {      // If anything comes in Serial,
+  /*
+   while (SerialIn.available()) {      // If anything comes in Serial,
     serCmd[serCmdIdx] = SerialIn.read();
     if (serCmd[serCmdIdx] == ' ') {
       serCmd[serCmdIdx] = '\0';
@@ -281,6 +282,7 @@ void frame( // Process motion for a single frame of left or right eye
       }
     }
   }
+  */
 
   if(++eyeIndex >= NUM_EYES) eyeIndex = 0; // Cycle through eyes, 1 per call
 
@@ -485,6 +487,4 @@ void loop() {
   
   split(oldIris, newIris, micros(), 10000000L, IRIS_MAX - IRIS_MIN);
   oldIris = newIris;
-
-
 }
