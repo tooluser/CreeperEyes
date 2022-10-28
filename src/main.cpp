@@ -218,70 +218,6 @@ void frame( // Process motion for a single frame of left or right eye
   static uint16_t serNewEyeCtrl = 0;
   static uint16_t serEyeCtrl = 0;
 
-  // Process serial input
-  // Command format: "#abxxxyyy_"
-  // #: Address (0: bcast, other 1-6)
-  // a: Eye position control
-  //    O: Auto mode
-  //    I: Controlled by xxxyyy  
-  // b: Eye type
-  //    O: Default
-  //    I: Newt
-  // xxx: x position in zero-extended decimal   000-255
-  // yyy: y position in zero-extended decimal 000-255
-  // _: space character
-
-  /*
-   while (SerialIn.available()) {      // If anything comes in Serial,
-    serCmd[serCmdIdx] = SerialIn.read();
-    if (serCmd[serCmdIdx] == ' ') {
-      serCmd[serCmdIdx] = '\0';
-      //Serial.println(serCmd);
-      if (serCmdIdx != SER_CMD_SIZE) {
-        Serial.println("Error: Serial command too short.");
-      } else {
-        if (serCmd[0] == '0' || serCmd[0] == '0' + serAddr) {
-          if (serCmd[1] == 'I') {
-            if (!isdigit(serCmd[3]) || !isdigit(serCmd[4]) || !isdigit(serCmd[5]) || !isdigit(serCmd[6]) || !isdigit(serCmd[7]) || !isdigit(serCmd[8])) {
-              Serial.println("Error: Serial position not a number");
-            } else { // If button is pressed, stop random eye movements and move (gracefully) to desired position
-              serNewEyeCtrl = serEyeCtrl = 1;
-              eyeX = 1020 - ((serCmd[3]-'0')*100 + (serCmd[4]-'0')*10 + (serCmd[5]-'0')) * 4;
-              eyeY = ((serCmd[6]-'0')*100 + (serCmd[7]-'0')*10 + (serCmd[8]-'0')) * 4;
-            }
-          } else if (serCmd[1] == 'O') {
-            serNewEyeCtrl = serEyeCtrl = 0;
-          } else {
-            Serial.println("Error: Serial command[1] unknown.");
-          }
-          if (serCmd[2] == 'O') { // Switch eye type right away based on button
-            sclera = scleraDefault;
-            upper = upperDefault;
-            lower = lowerDefault;
-            polar = polarDefault;
-            iris = irisDefault;
-          } else if (serCmd[2] == 'I') {
-            sclera = scleraNewt;
-            upper = upperNewt;
-            lower = lowerNewt;
-            polar = polarNewt;
-            iris = irisNewt;
-          } else {
-            Serial.println("Error: Serial command[2] unknown.");
-          }
-        }
-      }
-      serCmdIdx = 0;
-    } else {
-      serCmdIdx++;
-      if (serCmdIdx > SER_CMD_SIZE) {
-        Serial.println("Error: Serial command too long.");
-        serCmdIdx = 0;
-      }
-    }
-  }
-  */
-
   if(++eyeIndex >= NUM_EYES) eyeIndex = 0; // Cycle through eyes, 1 per call
 
   // X/Y movement
@@ -296,19 +232,6 @@ void frame( // Process motion for a single frame of left or right eye
   static int16_t  eyeOldX=512, eyeOldY=512, eyeCurX=512, eyeCurY=512, eyeNewX=512, eyeNewY=512;
   static uint32_t eyeMoveStartTime = 0L;
   static int32_t  eyeMoveDuration  = 0L;
-
-  // Added to original code
-  // If the controller sends a desired position, get out of random mode and move naturally to desired position
-  if (serNewEyeCtrl) {
-    eyeNewX = eyeX;
-    eyeNewY = eyeY;
-    eyeOldX = eyeCurX;                  // start from where we currently are
-    eyeOldY = eyeCurY;
-    eyeMoveDuration  = 100000;          // 100ms sec
-    eyeMoveStartTime = t;               // Save initial time of move
-    eyeInMotion      = true;            // Start move on next frame
-    serNewEyeCtrl = 0;
-  }
   
   int32_t dt = t - eyeMoveStartTime;      // uS elapsed since last eye event
 
@@ -348,10 +271,8 @@ void frame( // Process motion for a single frame of left or right eye
   }
   eyeCurX = eyeX;
   eyeCurY = eyeY;
-
   
   // Blinking
-
 #ifdef AUTOBLINK
   // Similar to the autonomous eye movement above -- blink start times
   // and durations are random (within ranges).
@@ -443,7 +364,6 @@ void frame( // Process motion for a single frame of left or right eye
 
 
 // AUTONOMOUS IRIS SCALING (if no photocell or dial) -----------------------
-
 // Autonomous iris motion uses a fractal behavior to similate both the major
 // reaction of the eye plus the continuous smaller adjustments that occur.
 
