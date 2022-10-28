@@ -165,23 +165,19 @@ void drawEye( // Renders one eye.  Inputs must be pre-clipped & valid.
       pBurst[burstIdx++] = p;
     }
   }
-
-  SPI.beginTransaction(settings);
   
+  eye[e].display.startWrite();
   eye[e].display.writeCommand(SSD1351_CMD_SETROW);    // Y range
-  eye[e].display.writeData(0); eye[e].display.writeData(SCREEN_HEIGHT - 1);
+  eye[e].display.write16(0x0);
+  eye[e].display.write16(SCREEN_HEIGHT - 1);
   eye[e].display.writeCommand(SSD1351_CMD_SETCOLUMN); // X range
-  eye[e].display.writeData(0); eye[e].display.writeData(SCREEN_WIDTH  - 1);
+  eye[e].display.write16(0x0);
+  eye[e].display.write16(SCREEN_WIDTH  - 1);
   eye[e].display.writeCommand(SSD1351_CMD_WRITERAM);  // Begin write
-
-  digitalWrite(eye[e].cs, LOW);                       // Chip select
-  digitalWrite(DISPLAY_DC, HIGH);                     // Data mode
 
   // For ESP32, use writePixels function to transfer the whole framebuffer in one large burst
   SPI.writePixels((uint8_t*)pBurst, sizeof(pBurst));
-  
-  digitalWrite(eye[e].cs, HIGH);          // Deselect
-  SPI.endTransaction();
+  eye[e].display.endWrite();
 }
 
 
