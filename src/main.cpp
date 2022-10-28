@@ -66,13 +66,18 @@ typedef struct {
   uint32_t startTime; // Time (micros) of last state change
 } eyeBlink;
 
+#define MOSI_PIN  23
+#define SCLK_PIN  18
+
 struct {
   displayType display; // OLED/TFT object
   uint8_t     cs;      // Chip select pin
   eyeBlink    blink;   // Current blink state
 } eye[] = { // OK to comment out one of these for single-eye display:
-  displayType(SELECT_L_PIN,DISPLAY_DC,0),SELECT_L_PIN,{NOBLINK},
-  displayType(SELECT_R_PIN,DISPLAY_DC,0),SELECT_R_PIN,{NOBLINK},
+  // displayType(SELECT_L_PIN,DISPLAY_DC,0),SELECT_L_PIN,{NOBLINK},
+  Adafruit_SSD1351(128, 128, &SPI, SELECT_L_PIN, DISPLAY_DC, DISPLAY_RESET), SELECT_L_PIN,{NOBLINK},
+
+  // displayType(SELECT_R_PIN,DISPLAY_DC,0),SELECT_R_PIN,{NOBLINK},
 };
 #define NUM_EYES (sizeof(eye) / sizeof(eye[0]))
 
@@ -450,7 +455,7 @@ void frame( // Process motion for a single frame of left or right eye
 
 uint16_t oldIris = (IRIS_MIN + IRIS_MAX) / 2, newIris;
 
-void split( // Subdivides motion path into two sub-paths w/randimization
+void split( // Subdivides motion path into two sub-paths w/randomization
   int16_t  startValue, // Iris scale value (IRIS_MIN to IRIS_MAX) at start
   int16_t  endValue,   // Iris scale value at end
   uint32_t startTime,  // micros() at start
