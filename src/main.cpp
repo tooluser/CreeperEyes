@@ -451,7 +451,7 @@ void frame( // Process motion for a single frame of left or right eye
 
 uint16_t oldIris = (IRIS_MIN + IRIS_MAX) / 2, newIris;
 
-void split( // Subdivides motion path into two sub-paths w/randimization
+void split( // Subdivides motion path into two sub-paths w/randomization
   int16_t  startValue, // Iris scale value (IRIS_MIN to IRIS_MAX) at start
   int16_t  endValue,   // Iris scale value at end
   uint32_t startTime,  // micros() at start
