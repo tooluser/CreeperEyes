@@ -38,10 +38,10 @@ const uint16_t (*iris)[IRIS_MAP_WIDTH] = irisDefault;
 
 typedef Adafruit_SSD1351 displayType; // Using OLED display(s)
 
-#define DISPLAY_DC      4 // Data/command pin for BOTH displays
-#define DISPLAY_RESET   2 // Reset pin for BOTH displays
+#define DISPLAY_DC      16 // Data/command pin for BOTH displays
+#define DISPLAY_RESET   5 // Reset pin for BOTH displays
 #define SELECT_L_PIN    17 // LEFT eye chip select pin
-#define SELECT_R_PIN    16 // RIGHT eye chip select pin
+#define SELECT_R_PIN    04 // RIGHT eye chip select pin
 #define UART_RX_PIN     13 // Pin to receive UART commands from controller
 
 // INPUT CONFIG (for eye motion -- enable or comment out as needed) --------
@@ -75,7 +75,6 @@ struct {
   displayType(SELECT_R_PIN,DISPLAY_DC,0),SELECT_R_PIN,{NOBLINK},
 };
 #define NUM_EYES (sizeof(eye) / sizeof(eye[0]))
-
 
 // INITIALIZATION -- runs once at startup ----------------------------------
 
