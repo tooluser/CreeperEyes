@@ -69,6 +69,7 @@ typedef struct {
 #define MOSI_PIN  23
 #define SCLK_PIN  18
 
+SPISettings settings(16000000, MSBFIRST, SPI_MODE3); // 26.667MHz seems reliable on the ESP32.
 struct {
   displayType display; // OLED/TFT object
   uint8_t     cs;      // Chip select pin
@@ -118,9 +119,6 @@ void setup(void) {
 
 
 // EYE-RENDERING FUNCTION --------------------------------------------------9
-
-SPISettings settings(16000000, MSBFIRST, SPI_MODE3); // 26.667MHz seems reliable on the ESP32.
-
 void drawEye( // Renders one eye.  Inputs must be pre-clipped & valid.
   uint8_t  e,       // Eye array index; 0 or 1 for left/right
   uint32_t iScale,  // Scale factor for iris
