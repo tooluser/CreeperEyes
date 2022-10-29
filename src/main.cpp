@@ -77,7 +77,7 @@ struct {
 } eye[] = { // OK to comment out one of these for single-eye display:
   // displayType(SELECT_L_PIN,DISPLAY_DC,0),SELECT_L_PIN,{NOBLINK},
   Adafruit_SSD1351(128, 128, &SPI, SELECT_L_PIN, DISPLAY_DC, DISPLAY_RESET), SELECT_L_PIN,{NOBLINK},
-
+  Adafruit_SSD1351(128, 128, &SPI, SELECT_R_PIN, DISPLAY_DC, DISPLAY_RESET), SELECT_L_PIN,{NOBLINK},
   // displayType(SELECT_R_PIN,DISPLAY_DC,0),SELECT_R_PIN,{NOBLINK},
 };
 #define NUM_EYES (sizeof(eye) / sizeof(eye[0]))
@@ -144,8 +144,9 @@ void drawEye( // Renders one eye.  Inputs must be pre-clipped & valid.
     scleraX = scleraXsave;
     irisX   = scleraXsave - (SCLERA_WIDTH - IRIS_WIDTH) / 2;
     for(screenX=0; screenX<SCREEN_WIDTH; screenX++, scleraX++, irisX++) {
-      if((lower[screenY][screenX] <= lT) ||
-         (upper[screenY][screenX] <= uT)) {             // Covered by eyelid
+      int effectiveX = e == 1 ? screenX : SCREEN_WIDTH - screenX;
+      if((lower[screenY][effectiveX] <= lT) ||
+         (upper[screenY][effectiveX] <= uT)) {             // Covered by eyelid
         p = 0;
       } else if((irisY < 0) || (irisY >= IRIS_HEIGHT) ||
                 (irisX < 0) || (irisX >= IRIS_WIDTH)) { // In sclera
@@ -314,7 +315,9 @@ void frame( // Process motion for a single frame of left or right eye
   // Scale eye X/Y positions (0-1023) to pixel units used by drawEye()
   eyeX = map(eyeX, 0, 1023, 0, SCLERA_WIDTH  - 128);
   eyeY = map(eyeY, 0, 1023, 0, SCLERA_HEIGHT - 128);
-  if(eyeIndex == 1) eyeX = (SCLERA_WIDTH - 128) - eyeX; // Mirrored display
+  if (eyeIndex == 1) { // this inverts the motion of the eyes
+    // eyeX = (SCLERA_WIDTH - 128) - eyeX; // Mirrored display
+  }
 
   // Horizontal position is offset so that eyes are very slightly crossed
   // to appear fixated (converged) at a conversational distance.  Number
